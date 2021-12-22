@@ -1,12 +1,52 @@
-console.log("---array functions---");
+console.log("concurrency-promise");
+// async await
 
-const arr1 = [
-  { d: "dr2", qty: 190 },
-  { d: "dr1", qty: 80 },
-  { d: "dr1", qty: 48 },
-];
-console.log("given\n", arr1);
+function createPromise(url) {
+  return new Promise((response, reject) => {
+    require("https").get(url, function (res) {
+      var body = "";
 
-console.log("result\n", null);
+      res.on("data", function (chunk) {
+        body += chunk;
+      });
 
-console.log("\n");
+      res.on("end", function () {
+        var fbResponse = JSON.parse(body);
+        response(fbResponse);
+      });
+    });
+  });
+}
+
+// iif_
+(async function () {
+  const arrayD = ["1", "4", "7", "137"];
+
+  const promises = arrayD.map((item) => {
+    return createPromise(`https://pokeapi.co/api/v2/pokemon/${item}`);
+  });
+
+  const pokemons = await Promise.all(promises);
+
+  function pokeShrinker(pokemon) {
+    return { name: pokemon.name, type: pokemon.types[0].type };
+  }
+
+  const shrinked = pokemons.map(pokeShrinker);
+
+  const typeRelPokemonPromises = shrinked.map(({ type }) => {
+    return createPromise(type.url);
+  });
+
+  const typeRelPokemon = await Promise.all(typeRelPokemonPromises);
+  const relPokemons = typeRelPokemon.map((t) => {
+    return t.pokemon.map((p) => p.pokemon.name).splice(0, 10);
+  });
+
+  const withRel = shrinked.map((d, i) => {
+    return { ...d, sameElement: relPokemons[i] };
+  });
+  console.log(withRel);
+})();
+
+console.log("cena");
