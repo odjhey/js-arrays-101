@@ -20,6 +20,16 @@ function createPromise(url) {
 
 // iif_
 (async function () {
+  /*
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 5000);
+  });
+
+  debugger;
+  */
+
   const arrayD = ["1", "4", "7", "137"];
 
   const promises = arrayD.map((item) => {
